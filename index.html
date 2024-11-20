@@ -64,7 +64,7 @@
 </body>
 <script>
    async function carregarFuncionarios() {
-        const url = "http://localhost:5000/funcionarios";
+        const url = `http://localhost:4000/funcionarios`;
         const funcionarios = await fetch(url)
         .then(response => response.json())
         .catch(err => console.error('erro ao carregar'));
@@ -92,7 +92,7 @@
                             <option value="0" ${funcionario.status == 0 ? 'selected' : ''}>Inativo</option>
                             <option value="2" ${funcionario.status == 2 ? 'selected' : ''}>Aposentado</option>
                         </select>
-                        <button class="btn btn-success btn-sm" onclick="excluirFuncionario(${funcionario.id})">Alterar Status</button>
+                        <button class="btn btn-success btn-sm" onclick="alterarStatus(${funcionario.id})">Alterar Status</button>
                     </div>
                     </div>
             `;
@@ -106,7 +106,7 @@
         })
     }
 
-    carregarFuncionarios();
+  
 
     function editarfuncionario(id){
         // chama a função para editar funcionario
@@ -116,7 +116,7 @@
     // chama a função para excluir funcionario
     if (confirm('deseja excluir este func.')) {
         try {
-            const response = await fetch(`http://localhost:5000/funcionarios/${id}`, {
+            const response = await fetch(`http://localhost:4000/funcionarios/${id}`, {
                 method: 'DELETE',
             });
 
@@ -131,6 +131,42 @@
         }
     }
 }
+
+ // Função para alterar o status de um funcionário
+ async function alterarStatus(id) {
+      // Obtém o novo status e o nome do funcionário
+      const status = document.getElementById(`status-${id}`).value;
+      const nome = document.getElementById(`nome-${id}`).textContent;
+
+      // Dados que serão enviados à API
+      const data = {
+        id: id,
+        status: status,
+        nome: nome
+      };
+
+      try {
+        const response = await fetch(`https://localhost:4000/funcionarios/${id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data),
+        });
+
+        if (response.ok) {
+          alert('Status atualizado com sucesso!');
+          carregarFuncionarios(); // Recarrega a lista
+        } else {
+          alert('Erro ao alterar o status!');
+        }
+      } catch (error) {
+        console.error('Erro ao alterar o status:', error);
+      }
+    }
+
+    // Chama a função para carregar os funcionários ao iniciar a página
+    carregarFuncionarios();
 </script>
 
 </html>
